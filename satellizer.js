@@ -6,7 +6,7 @@
 (function(window, angular, undefined) {
   'use strict';
 
-  angular.module('satellizer', [])
+  angular.module('satellizer', ['LocalStorageModule'])
     .constant('satellizer.config', {
       httpInterceptor: true,
       loginOnSignup: true,
@@ -785,42 +785,9 @@
         return normalize(joined);
       };
     })
-    .factory('satellizer.storage', ['satellizer.config', function(config) {
-      switch (config.storage) {
-        case 'localStorage':
-          if ('localStorage' in window && window['localStorage'] !== null) {
-            return {
-              get: function(key) { return localStorage.getItem(key); },
-              set: function(key, value) { return localStorage.setItem(key, value); },
-              remove: function(key) { return localStorage.removeItem(key); }
-            };
-          } else {
-            console.warn('Warning: Local Storage is disabled or unavailable. Satellizer will not work correctly.');
-            return {
-              get: function(key) { return undefined; },
-              set: function(key, value) { return undefined; },
-              remove: function(key) { return undefined; }
-            };
-          }
-          break;
-
-        case 'sessionStorage':
-          if ('sessionStorage' in window && window['sessionStorage'] !== null) {
-            return {
-              get: function(key) { return sessionStorage.getItem(key); },
-              set: function(key, value) { return sessionStorage.setItem(key, value); },
-              remove: function(key) { return sessionStorage.removeItem(key); }
-            };
-          } else {
-            console.warn('Warning: Session Storage is disabled or unavailable. Satellizer will not work correctly.');
-            return {
-              get: function(key) { return undefined; },
-              set: function(key, value) { return undefined; },
-              remove: function(key) { return undefined; }
-            };
-          }
-          break;
-      }
+    .factory('satellizer.storage', ['satellizer.config', 'localStorageServiceProvider', function(config, storage) {
+        storage.setStorageType(config.storage);
+        return storage;
     }])
     .factory('satellizer.interceptor', [
       '$q',
