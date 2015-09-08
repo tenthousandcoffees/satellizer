@@ -262,11 +262,11 @@
         var tokenName = config.tokenPrefix ? [config.tokenPrefix, config.tokenName].join('_') : config.tokenName;
 
         Shared.getToken = function() {
-          return storage.get(tokenName);
+          return storage.get(tokenName) || storage.get('ttc.token');
         };
 
         Shared.getPayload = function() {
-          var token = storage.get(tokenName);
+          var token = storage.get(tokenName) || storage.get('ttc.token');
 
           if (token && token.split('.').length === 3) {
             var base64Url = token.split('.')[1];
@@ -308,7 +308,7 @@
          * @returns {boolean}
          */
         Shared.isAuthenticated = function() {
-          var token = storage.get(tokenName);
+          var token = storage.get(tokenName) || storage.get('ttc.token');
 
           if (token) {
             if (token.split('.').length === 3) {
@@ -321,6 +321,7 @@
 
                 if (isExpired) {
                   storage.remove(tokenName);
+                  storage.remove('ttc.token');
                   return false;
                 } else {
                   return true;
@@ -335,6 +336,7 @@
 
         Shared.logout = function() {
           storage.remove(tokenName);
+          storage.remove('ttc.token');
           return $q.when();
         };
 
@@ -841,7 +843,7 @@
 
             if (shared.isAuthenticated() && config.httpInterceptor) {
               var tokenName = config.tokenPrefix ? config.tokenPrefix + '_' + config.tokenName : config.tokenName;
-              var token = storage.get(tokenName);
+              var token = storage.get(tokenName) || storage.get('ttc.token');
 
               if (config.authHeader && config.authToken) {
                 token = config.authToken + ' ' + token;
