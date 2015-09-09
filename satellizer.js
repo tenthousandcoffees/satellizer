@@ -707,6 +707,7 @@
 
             if (!Popup.popupWindow || Popup.popupWindow.closed || Popup.popupWindow.closed === undefined) {
               $interval.cancel(polling);
+              deferred.reject('Authorization Failed');
             }
           }, 50);
 
